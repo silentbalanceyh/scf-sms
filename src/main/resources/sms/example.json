@@ -1,0 +1,3 @@
+{
+    "pattern": "Hello ${name}, my email is ${email}, please send email to contact with me."
+}
