@@ -1,11 +1,7 @@
 
 package com.fasterxml.jackson.core;
 
-import java.time.Instant;
 import java.util.*;
-import java.util.stream.Stream;
-
-import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class JsonObject implements Iterable<Map.Entry<String, Object>> {
@@ -83,18 +79,6 @@ public class JsonObject implements Iterable<Map.Entry<String, Object>> {
             val = new JsonArray((List) val);
         }
         return (JsonArray) val;
-    }
-
-    public byte[] getBinary(final String key) {
-        Objects.requireNonNull(key);
-        final String encoded = (String) map.get(key);
-        return encoded == null ? null : Base64.getDecoder().decode(encoded);
-    }
-
-    public Instant getInstant(final String key) {
-        Objects.requireNonNull(key);
-        final String encoded = (String) map.get(key);
-        return encoded == null ? null : Instant.from(ISO_INSTANT.parse(encoded));
     }
 
     public Object getValue(final String key) {
@@ -194,20 +178,6 @@ public class JsonObject implements Iterable<Map.Entry<String, Object>> {
         return val != null || map.containsKey(key) ? val : def;
     }
 
-    public byte[] getBinary(final String key, final byte[] def) {
-        Objects.requireNonNull(key);
-        final Object val = map.get(key);
-        return val != null || map.containsKey(key) ? (val == null ? null : Base64.getDecoder().decode((String) val))
-                : def;
-    }
-
-    public Instant getInstant(final String key, final Instant def) {
-        Objects.requireNonNull(key);
-        final Object val = map.get(key);
-        return val != null || map.containsKey(key)
-                ? (val == null ? null : Instant.from(ISO_INSTANT.parse((String) val))) : def;
-    }
-
     public Object getValue(final String key, final Object def) {
         Objects.requireNonNull(key);
         final Object val = getValue(key);
@@ -289,18 +259,6 @@ public class JsonObject implements Iterable<Map.Entry<String, Object>> {
         return this;
     }
 
-    public JsonObject put(final String key, final byte[] value) {
-        Objects.requireNonNull(key);
-        map.put(key, value == null ? null : Base64.getEncoder().encodeToString(value));
-        return this;
-    }
-
-    public JsonObject put(final String key, final Instant value) {
-        Objects.requireNonNull(key);
-        map.put(key, value == null ? null : ISO_INSTANT.format(value));
-        return this;
-    }
-
     public JsonObject put(final String key, Object value) {
         Objects.requireNonNull(key);
         value = Json.checkAndCopy(value, false);
@@ -329,7 +287,7 @@ public class JsonObject implements Iterable<Map.Entry<String, Object>> {
             return this;
         }
         for (final Map.Entry<String, Object> e : other.map.entrySet()) {
-            map.merge(e.getKey(), e.getValue(), (oldVal, newVal) -> {
+            /*map.merge(e.getKey(), e.getValue(), (oldVal, newVal) -> {
                 if (oldVal instanceof Map) {
                     oldVal = new JsonObject((Map) oldVal);
                 }
@@ -340,7 +298,7 @@ public class JsonObject implements Iterable<Map.Entry<String, Object>> {
                     return ((JsonObject) oldVal).mergeIn((JsonObject) newVal, depth - 1);
                 }
                 return newVal;
-            });
+            });*/
         }
         return this;
     }
@@ -370,10 +328,6 @@ public class JsonObject implements Iterable<Map.Entry<String, Object>> {
 
     public Map<String, Object> getMap() {
         return map;
-    }
-
-    public Stream<Map.Entry<String, Object>> stream() {
-        return Json.asStream(iterator());
     }
 
     @Override

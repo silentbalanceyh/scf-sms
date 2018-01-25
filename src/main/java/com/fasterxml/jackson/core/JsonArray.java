@@ -1,11 +1,7 @@
 
 package com.fasterxml.jackson.core;
 
-import java.time.Instant;
 import java.util.*;
-import java.util.stream.Stream;
-
-import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class JsonArray implements Iterable<Object> {
@@ -95,24 +91,6 @@ public class JsonArray implements Iterable<Object> {
         return (JsonArray) val;
     }
 
-    public byte[] getBinary(final int pos) {
-        final String val = (String) this.list.get(pos);
-        if (val == null) {
-            return null;
-        } else {
-            return Base64.getDecoder().decode(val);
-        }
-    }
-
-    public Instant getInstant(final int pos) {
-        final String val = (String) this.list.get(pos);
-        if (val == null) {
-            return null;
-        } else {
-            return Instant.from(ISO_INSTANT.parse(val));
-        }
-    }
-
     public Object getValue(final int pos) {
         Object val = this.list.get(pos);
         if (val instanceof Map) {
@@ -192,18 +170,6 @@ public class JsonArray implements Iterable<Object> {
         return this;
     }
 
-    public JsonArray add(final byte[] value) {
-        Objects.requireNonNull(value);
-        this.list.add(Base64.getEncoder().encodeToString(value));
-        return this;
-    }
-
-    public JsonArray add(final Instant value) {
-        Objects.requireNonNull(value);
-        this.list.add(ISO_INSTANT.format(value));
-        return this;
-    }
-
     public JsonArray add(Object value) {
         Objects.requireNonNull(value);
         value = Json.checkAndCopy(value, false);
@@ -272,10 +238,6 @@ public class JsonArray implements Iterable<Object> {
             copiedList.add(val);
         }
         return new JsonArray(copiedList);
-    }
-
-    public Stream<Object> stream() {
-        return Json.asStream(this.iterator());
     }
 
     @Override

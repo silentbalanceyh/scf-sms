@@ -8,12 +8,7 @@ import com.kingxunlian.exception.internal.EncodeException;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.util.*;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
-import static java.time.format.DateTimeFormatter.ISO_INSTANT;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class Json {
@@ -34,7 +29,7 @@ public class Json {
         module.addSerializer(JsonObject.class, new JsonObjectSerializer());
         module.addSerializer(JsonArray.class, new JsonArraySerializer());
 
-        module.addSerializer(Instant.class, new InstantSerializer());
+        // module.addSerializer(Instant.class, new InstantSerializer());
         module.addSerializer(byte[].class, new ByteArraySerializer());
 
         mapper.registerModule(module);
@@ -152,19 +147,10 @@ public class Json {
             } else {
                 val = new JsonArray((List) val);
             }
-        } else if (val instanceof byte[]) {
-            val = Base64.getEncoder().encodeToString((byte[]) val);
-        } else if (val instanceof Instant) {
-            val = ISO_INSTANT.format((Instant) val);
         } else {
             throw new IllegalStateException("Illegal type in JsonObject: " + val.getClass());
         }
         return val;
-    }
-
-    static <T> Stream<T> asStream(final Iterator<T> sourceIterator) {
-        final Iterable<T> iterable = () -> sourceIterator;
-        return StreamSupport.stream(iterable.spliterator(), false);
     }
 
     public static boolean isJObject(final String literal) {
@@ -200,13 +186,6 @@ public class Json {
         @Override
         public void serialize(final JsonArray value, final JsonGenerator jgen, final SerializerProvider provider) throws IOException {
             jgen.writeObject(value.getList());
-        }
-    }
-
-    private static class InstantSerializer extends JsonSerializer<Instant> {
-        @Override
-        public void serialize(final Instant value, final JsonGenerator jgen, final SerializerProvider provider) throws IOException {
-            jgen.writeString(ISO_INSTANT.format(value));
         }
     }
 }
